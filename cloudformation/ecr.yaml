@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: codebuild
+
+Resources:
+  TestEcr:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: autoscale-test-repo
+      ImageScanningConfiguration:
+        ScanOnPush: false

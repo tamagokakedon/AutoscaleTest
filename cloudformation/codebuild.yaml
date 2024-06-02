@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: codebuild
+
+Resources:
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts: 
+        Type: NO_ARTIFACTS
+      Source:
+        Type: GITHUB
+        Location: https://github.com/tamagokakedon/AutoscaleTest
+        BuildSpec: buildspec/buildspec.yaml
+      SourceVersion: refs/heads/main
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        Type: LINUX_CONTAINER
+        PrivilegedMode: true
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+      Name: AutoscaleTest-buildimage
+      ServiceRole: !Ref BuildPrjRole
+      #VpcConfig:
+      #  VpcId: vpc-096479986d6ba5057
+      #  Subnets: subnet-01f405269cceb93c8
+      #  SecurityGroupIds: !Ref BuildPrjSg
+
+  BuildPrjRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: codebuild-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: codebuild-policy
+          PolicyDocument: 
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
